@@ -32,7 +32,9 @@ Flags:
 Rooms live in memory: joining a room that doesn't exist creates it, and it
 disappears when the last member leaves. The %q room is the exception: it
 starts with the server and exists as long as the server runs. Anyone who
-connects without choosing a room lands there.
+connects without choosing a room lands there. A room name is at most 64
+UTF-8 bytes and may not contain control characters; anything else is
+refused with an error, not rewritten.
 
 Messages larger than %d MB are refused and that connection is closed. Each
 connection may send 5 messages a second (bursts of 20) and 256 KB a second;

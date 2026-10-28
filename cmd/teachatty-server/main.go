@@ -100,6 +100,15 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// no room in the URL (old client, another program): goes to the default room.
+	// The effective name is validated before anything else is set up for this
+	// request (IP slot, upgrade, room), so a refused one leaves nothing behind.
+	name := cmp.Or(r.URL.Query().Get("room"), defaultRoom)
+	if !validRoomName(name) {
+		http.Error(w, "invalid room name: at most 64 UTF-8 bytes, no control characters", http.StatusBadRequest)
+		return
+	}
+
 	// one IP can't hold more than --max-per-ip connections (see limits.go)
 	release, ok := acquireIP(r)
 	if !ok {
@@ -119,8 +128,6 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 	// close 1009 ("message too big") and this connection leaves the loop and the room like any other
 	conn.SetReadLimit(maxMessage)
 
-	// no room in the URL (old client, another program): goes to the default room
-	name := cmp.Or(r.URL.Query().Get("room"), defaultRoom)
 	alias := sanitizeAlias(r.URL.Query().Get("alias"))
 
 	// joining a room that doesn't exist creates it

@@ -28,7 +28,7 @@ teachatty is **free and open source software under the [GNU AGPL-3.0](LICENSE)**
 
 What works today:
 
-- Rooms: joining a room that doesn't exist creates it, and a room disappears when its last member leaves. The default room, `local`, is the exception: it exists as long as the server runs.
+- Rooms: joining a room that doesn't exist creates it, and a room disappears when its last member leaves. The default room, `local`, is the exception: it exists as long as the server runs. A room name is at most 64 UTF-8 bytes with no control characters; anything else is refused with an error, never rewritten.
 - Aliases: your name appears in front of every message you send.
 - Command-line flags for server, room and alias.
 - A full-screen terminal UI: messages on top, an input box at the bottom that grows as you type. Incoming messages never overwrite what you're typing.

@@ -73,6 +73,12 @@ second; above that, the server reads it more slowly, so senders are slowed down
 instead of anything being dropped. A member that stops reading (a laptop asleep, a
 dropped network) is dropped after 5 seconds, so it can't freeze the room.
 Connections from web browsers are refused.
+Room names are limited to 64 UTF-8 bytes and may contain no control characters:
+a name that is too long or carries one is refused with an error, not rewritten.
+Everything else is taken exactly as given, so accents, emoji and spaces all work.
+Connecting without a room name, or with an empty one, joins the
+.B local
+room described above.
 .SH SECURITY
 Traffic is encrypted with TLS by default. Without
 .BR \-\-tls\-cert ,

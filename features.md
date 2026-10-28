@@ -2,6 +2,15 @@
 
 Log of shipped features, newest first. Add an entry with every commit.
 
+## 2026-10-28 10:45 — Room names limited to 64 bytes, control characters refused
+
+- Room names are the keys of the server's `rooms` map, taken verbatim from the URL, so any size was accepted before: a client with a script could grow the map without bound. Names are now validated where they enter the server (`cmd/teachatty-server/roomname.go`): at most 64 UTF-8 bytes (bytes, not runes, so multibyte names are bounded too) and no control characters (newline, ESC, DEL, ...).
+- A name is taken as-is or refused with 400 Bad Request, never rewritten — unlike aliases (`alias.go`), which are display values and may be sanitized. Accents, emoji and spaces all work.
+- Validation runs in `handleWS` before the per-IP slot is taken, before the WebSocket upgrade and before the room can be created, so a refused request leaves nothing behind. Omitted and empty `room` parameters still land in `local`, unchanged.
+- No global room-count limit, and no new dependencies.
+- Docs: the server man page's LIMITS section, the server's `-h` help (`usage.go`), the client man page's `--room` flag and the README's Rooms bullet now describe the limit.
+- **Tested:** new tests in `cmd/teachatty-server/roomname_test.go` cover ordinary names, the 64-byte boundary (exactly 64 accepted, 65 refused), multibyte names measured in bytes (32 × `é` accepted, 33 refused), control runes, and the `local` default for omitted and empty `room`. `go test ./cmd/teachatty-server/`, `go test ./...`, `go test -race ./...`, `go vet ./...` and `gofmt -l .` pass; the only failure is the pre-existing Windows-only `internal/tlstrust/TestCertificateIsGeneratedOnceAndReused` (Go reports mode 666 for files on Windows), reproduced at the clean baseline `f5805c0` with `go test ./internal/tlstrust/ -run TestCertificateIsGeneratedOnceAndReused -count=1` in a separate worktree.
+
 ## 2026-10-19 17:43 — Safer rooms and aliases, pipe-mode tests (PR #2)
 
 - Contributed by malcommathela in [PR #2](https://github.com/daniel-cmdline/teachatty/pull/2).

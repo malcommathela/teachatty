@@ -54,7 +54,9 @@ Default:
 .BR localhost:7347 .
 .TP
 .BI \-\-room " name"
-The room to join. It is created if it doesn't exist. Default:
+The room to join. It is created if it doesn't exist. A name is at most 64 UTF\-8
+bytes and may contain no control characters; the server refuses anything else.
+Default:
 .BR local .
 .TP
 .BI \-\-alias " name"
